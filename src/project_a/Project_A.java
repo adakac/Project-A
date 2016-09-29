@@ -1,21 +1,30 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+        Copyright (C)
+
+        This program is free software: you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.
+
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 package project_a;
 
 /**
- *
- * @author AKNW-HWK
+ * @version 0.000a
+ * @author adakac, heralc15
  */
 public class Project_A {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
+    public static void main(String[] args) 
+    {
+        System.out.println("This is a basic Function.");
     }
     
 }
