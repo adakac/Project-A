@@ -23,7 +23,7 @@
  * Change Type | Contributer | Change Date | Description                       *
  *-------------+-------------+-------------+-----------------------------------*
  * Milestone   | adakac      | 01.10.2016  | Added Intro Sequence              *
- *             |             |             |                                   *
+ * Milestone   | adakac      | 02.10.2016  | Added Main Menu Buttons w/o Func. *
  *             |             |             |                                   *
  *             |             |             |                                   *
  *             |             |             |                                   *
@@ -33,14 +33,15 @@
 
 package project_a;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.File;
 import javafx.application.Application;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -52,8 +53,12 @@ public class Project_A extends Application
 /******************************************************************************/
 //                              Variables                                     //    
 /******************************************************************************/
+    // Debug Variables, DEFAULT = FALSE
+    static boolean debug_skipIntro = false;
+    
+    // Variables
     double displayWidth, displayHeight;
-            
+    String lastLocation;
 /******************************************************************************/
     
     @Override
@@ -65,16 +70,16 @@ public class Project_A extends Application
         primaryStage.setFullScreenExitHint("");
         primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         
-        playIntro(primaryStage);
+        if(debug_skipIntro == true)
+            startMenu(primaryStage);
+        else
+            playIntro(primaryStage);
     }
 
-    public static void main(String[] args) 
-    {
-        launch(args);
-    }
-    
     public void playIntro(Stage primaryStage)
     {
+        lastLocation = "playIntro";
+        
         // Get intro file
         File f=new File("src/project_a/intro.mp4");
         Media m=new Media(f.toURI().toString());
@@ -83,7 +88,7 @@ public class Project_A extends Application
         
         // Prepare scene
         StackPane root = new StackPane();
-        Scene scene = new Scene(root, displayWidth, displayHeight);   
+        Scene sceneIntro = new Scene(root, displayWidth, displayHeight);   
         
         // Add player and play
         root.setBackground(Background.EMPTY);
@@ -91,19 +96,71 @@ public class Project_A extends Application
         mp.play();
         
         // Set scene and show
-        primaryStage.setScene(scene);
+        primaryStage.setScene(sceneIntro);
         primaryStage.show();
         
         mp.setOnEndOfMedia(new Runnable() 
         {
             @Override
-            public void run() {
+            public void run() 
+            {
                 primaryStage.close();
+                startMenu(primaryStage);
             }
         });
     }
     
+    public void startMenu(Stage primaryStage)
+    {
+        lastLocation = "startMenu";
+        
+        primaryStage.setFullScreen(true);
+        
+        // Remove 'Exit Fullscreen' function
+        primaryStage.setFullScreenExitHint("");
+        primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        
+        GridPane grid = new GridPane();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+        
+        Button btPlay = new Button("Play");
+        btPlay.setMinWidth(80);
+        grid.add(btPlay, 0, 1);
+
+        Button btLoad = new Button("Load");
+        btLoad.setMinWidth(80);
+        grid.add(btLoad, 0, 2);
+
+        Button btSettings = new Button("Settings");
+        btSettings.setMinWidth(80);
+        grid.add(btSettings, 0, 3);
+        
+        Button btCredits = new Button("Credits");
+        btCredits.setMinWidth(80);
+        grid.add(btCredits, 0, 4);
+        
+        Button btExit = new Button("Exit Game");
+        btExit.setMinWidth(80);
+        grid.add(btExit, 0, 5);
+        
+        // Prepare scene
+        StackPane root = new StackPane();
+        Scene sceneMenu = new Scene(root, displayWidth, displayHeight);  
+        
+        root.setStyle("-fx-background: #000000;");
+        root.getChildren().add(grid);
+        
+        primaryStage.setScene(sceneMenu);
+        primaryStage.show();
+    }
     
+    public static void main(String[] args) 
+    {
+        launch(args);
+    }
 }
 
 
