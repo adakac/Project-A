@@ -24,7 +24,7 @@
  *-------------+-------------+-------------+-----------------------------------*
  * Milestone   | adakac      | 01.10.2016  | Added Intro Sequence              *
  * Milestone   | adakac      | 02.10.2016  | Added Main Menu Buttons w/o Func. *
- *             |             |             |                                   *
+ * Milestone   | adakac      | 02.10.2016  | Added function to Quit button     *
  *             |             |             |                                   *
  *             |             |             |                                   *
  *             |             |             |                                   *
@@ -34,11 +34,18 @@
 package project_a;
 
 import java.io.File;
+import java.util.Optional;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DialogPane;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
@@ -46,6 +53,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 public class Project_A extends Application 
@@ -145,6 +153,28 @@ public class Project_A extends Application
         Button btExit = new Button("Exit Game");
         btExit.setMinWidth(80);
         grid.add(btExit, 0, 5);
+        btExit.setOnAction(new EventHandler<ActionEvent>() 
+        {
+            @Override
+            public void handle(ActionEvent event) 
+            {
+                Alert alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("");
+                alert.initModality(Modality.APPLICATION_MODAL);
+                alert.initOwner(primaryStage);
+                alert.setHeaderText("Quit Game");
+                alert.setContentText("Are you sure?");
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK){
+                    System.exit(1);
+                }else 
+                {
+                    alert.close();
+                }
+                
+            }
+        });
         
         // Prepare scene
         StackPane root = new StackPane();
