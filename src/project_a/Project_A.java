@@ -25,7 +25,7 @@
  * Milestone   | adakac      | 01.10.2016  | Added Intro Sequence              *
  * Milestone   | adakac      | 02.10.2016  | Added Main Menu Buttons w/o Func. *
  * Milestone   | adakac      | 02.10.2016  | Added function to Quit button     *
- *             |             |             |                                   *
+ * Milestone   | adakac      | 20.10.2016  | Added Settings GUI w/o Audio Func.*
  *             |             |             |                                   *
  *             |             |             |                                   *
  *             |             |             |                                   *
@@ -36,6 +36,9 @@ package project_a;
 import java.io.File;
 import java.util.Optional;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -45,8 +48,12 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -65,8 +72,15 @@ public class Project_A extends Application
     static boolean debug_skipIntro = true;
     
     // Variables
-    double displayWidth, displayHeight;
-    String lastLocation;
+    double  displayWidth,           //width in px
+            displayHeight;          //hight in px
+    int     audioVolume,            //Volume in percent
+            language=1;             //1=english 2=german
+    String  lastLocation;           //
+    
+    
+    // Root Stages
+    StackPane rootMenu;
 /******************************************************************************/
     
     @Override
@@ -128,31 +142,142 @@ public class Project_A extends Application
         primaryStage.setFullScreenExitHint("");
         primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
         
-        GridPane grid = new GridPane();
-        grid.setAlignment(Pos.CENTER);
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(25, 25, 25, 25));
+        GridPane buttonGrid = new GridPane();
+        buttonGrid.setAlignment(Pos.CENTER);
+        buttonGrid.setHgap(10);
+        buttonGrid.setVgap(10);
+        buttonGrid.setPadding(new Insets(25, 25, 25, 25));
         
         Button btPlay = new Button("Play");
         btPlay.setMinWidth(80);
-        grid.add(btPlay, 0, 1);
+        buttonGrid.add(btPlay, 0, 1);
 
         Button btLoad = new Button("Load");
         btLoad.setMinWidth(80);
-        grid.add(btLoad, 0, 2);
+        buttonGrid.add(btLoad, 0, 2);
 
         Button btSettings = new Button("Settings");
         btSettings.setMinWidth(80);
-        grid.add(btSettings, 0, 3);
-        
+        buttonGrid.add(btSettings, 0, 3);
+        btSettings.setOnAction(new EventHandler<ActionEvent>() 
+        {
+            @Override
+            public void handle(ActionEvent event) 
+            {
+                lastLocation = "onSettingsKlicked";
+                
+                primaryStage.close();
+                primaryStage.setFullScreen(true);
+
+                // Remove 'Exit Fullscreen' function
+                primaryStage.setFullScreenExitHint("");
+                primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+
+                // Prepare scene
+                rootMenu = new StackPane();
+                Scene sceneMenu = new Scene(rootMenu, displayWidth, displayHeight);  
+
+                rootMenu.setStyle("-fx-background: #000000;");
+                
+                primaryStage.setScene(sceneMenu);
+                primaryStage.show();
+                
+                GridPane settingsGrid = new GridPane();
+                settingsGrid.setAlignment(Pos.CENTER);
+                settingsGrid.setHgap(10);
+                settingsGrid.setVgap(10);
+                settingsGrid.setPadding(new Insets(25, 25, 25, 25));
+                
+                Label lbVolumeValue = new Label();
+                lbVolumeValue.setMinWidth(50);
+                
+                Label lbVolumeText = new Label();
+                lbVolumeText.setAlignment(Pos.CENTER_RIGHT);
+                lbVolumeText.setMinWidth(100);
+                
+                Button btLeaveSettings = new Button("Back to the menu");
+                btLeaveSettings.setMinWidth(150);
+                btLeaveSettings.setOnAction(new EventHandler<ActionEvent>() 
+                {
+                    @Override
+                    public void handle(ActionEvent event) 
+                    {
+                        primaryStage.close();
+                        startMenu(primaryStage);
+                    }
+                });
+                
+                Slider volumeSlider = new Slider();
+                volumeSlider.setMin(0);
+                volumeSlider.setMax(100);
+                volumeSlider.setValue(50);
+                lbVolumeValue.setText(((int)volumeSlider.getValue())+"");
+                volumeSlider.setShowTickLabels(true);
+                volumeSlider.setShowTickMarks(true);
+                volumeSlider.setMajorTickUnit(50);
+                volumeSlider.setMinorTickCount(5);
+                volumeSlider.setBlockIncrement(10);
+                volumeSlider.valueProperty().addListener(new ChangeListener<Number>()
+                {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) 
+                    {
+                        audioVolume = (int) volumeSlider.getValue();
+                        lbVolumeValue.setText(audioVolume+"");
+                    }
+                });
+                
+                ChoiceBox languageBox = new ChoiceBox(FXCollections.observableArrayList("English", "German"));
+                languageBox.setMinWidth(150);
+                if(language == 1)
+                {
+                    lbVolumeText.setText("Volume");
+                    languageBox.setValue("English");
+                }
+                    
+                if(language == 2)
+                {
+                    languageBox.setValue("German");
+                    lbVolumeText.setText("Lautstärke");
+                }
+                
+                languageBox.valueProperty().addListener(new ChangeListener<String>()
+                {
+                    @Override
+                    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue)
+                    {
+                        switch((String)languageBox.getValue())
+                        {
+                            case "English": language=1;
+                                            lbVolumeText.setText("Volume");
+                                            break;
+                                            
+                            case "German":  language=2;
+                                            lbVolumeText.setText("Lautstärke");
+                                            break;
+                        }
+                        rootMenu.requestLayout();
+                    }
+
+                });
+                
+                settingsGrid.add(lbVolumeText, 0, 0);
+                settingsGrid.add(volumeSlider, 1, 0);
+                settingsGrid.add(lbVolumeValue, 2, 0);
+                settingsGrid.add(languageBox, 1, 1);
+                settingsGrid.add(btLeaveSettings,1,2);
+                rootMenu.getChildren().add(settingsGrid);
+                rootMenu.setVisible(true);
+            }
+        });
+                
         Button btCredits = new Button("Credits");
         btCredits.setMinWidth(80);
-        grid.add(btCredits, 0, 4);
+        buttonGrid.add(btCredits, 0, 4);
         
         Button btExit = new Button("Exit Game");
         btExit.setMinWidth(80);
-        grid.add(btExit, 0, 5);
+        buttonGrid.add(btExit, 0, 5);
         btExit.setOnAction(new EventHandler<ActionEvent>() 
         {
             @Override
@@ -177,11 +302,11 @@ public class Project_A extends Application
         });
         
         // Prepare scene
-        StackPane root = new StackPane();
-        Scene sceneMenu = new Scene(root, displayWidth, displayHeight);  
+        rootMenu = new StackPane();
+        Scene sceneMenu = new Scene(rootMenu, displayWidth, displayHeight);  
         
-        root.setStyle("-fx-background: #000000;");
-        root.getChildren().add(grid);
+        rootMenu.setStyle("-fx-background: #000000;");
+        rootMenu.getChildren().add(buttonGrid);
         
         primaryStage.setScene(sceneMenu);
         primaryStage.show();
