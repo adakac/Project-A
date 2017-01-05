@@ -149,15 +149,15 @@ public class Project_A extends Application
         buttonGrid.setPadding(new Insets(25, 25, 25, 25));
         
         Button btPlay = new Button("Play");
-        btPlay.setMinWidth(80);
+        btPlay.setMinWidth(100);
         buttonGrid.add(btPlay, 0, 1);
 
         Button btLoad = new Button("Load");
-        btLoad.setMinWidth(80);
+        btLoad.setMinWidth(100);
         buttonGrid.add(btLoad, 0, 2);
 
         Button btSettings = new Button("Settings");
-        btSettings.setMinWidth(80);
+        btSettings.setMinWidth(100);
         buttonGrid.add(btSettings, 0, 3);
         btSettings.setOnAction(new EventHandler<ActionEvent>() 
         {
@@ -272,11 +272,11 @@ public class Project_A extends Application
         });
                 
         Button btCredits = new Button("Credits");
-        btCredits.setMinWidth(80);
+        btCredits.setMinWidth(100);
         buttonGrid.add(btCredits, 0, 4);
         
         Button btExit = new Button("Exit Game");
-        btExit.setMinWidth(80);
+        btExit.setMinWidth(100);
         buttonGrid.add(btExit, 0, 5);
         btExit.setOnAction(new EventHandler<ActionEvent>() 
         {
