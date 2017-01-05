@@ -26,7 +26,7 @@
  * Milestone   | adakac      | 02.10.2016  | Added Main Menu Buttons w/o Func. *
  * Milestone   | adakac      | 02.10.2016  | Added function to Quit button     *
  * Milestone   | adakac      | 20.10.2016  | Added Settings GUI w/o Audio Func.*
- *             |             |             |                                   *
+ * Milestone   | heralc15    | 05.01.2017  | Adjusted button size              *
  *             |             |             |                                   *
  *             |             |             |                                   *
  ******************************************************************************/
