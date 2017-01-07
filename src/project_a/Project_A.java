@@ -27,6 +27,9 @@
  * Milestone   | adakac      | 02.10.2016  | Added function to Quit button     *
  * Milestone   | adakac      | 20.10.2016  | Added Settings GUI w/o Audio Func.*
  * Milestone   | heralc15    | 05.01.2017  | Adjusted button size              *
+ * Milestone   | adakac      | 07.01.2017  | Fixed the exit alert              *
+ *             |             |             |                                   *
+ *             |             |             |                                   *
  *             |             |             |                                   *
  *             |             |             |                                   *
  ******************************************************************************/
@@ -36,6 +39,7 @@ package project_a;
 import java.io.File;
 import java.util.Optional;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -62,6 +66,7 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class Project_A extends Application 
 {
@@ -278,26 +283,30 @@ public class Project_A extends Application
         Button btExit = new Button("Exit Game");
         btExit.setMinWidth(100);
         buttonGrid.add(btExit, 0, 5);
-        btExit.setOnAction(new EventHandler<ActionEvent>() 
-        {
-            @Override
-            public void handle(ActionEvent event) 
-            {
-                Alert alert = new Alert(AlertType.CONFIRMATION);
-                alert.setTitle("");
-                alert.initModality(Modality.APPLICATION_MODAL);
-                alert.initOwner(primaryStage);
-                alert.setHeaderText("Quit Game");
-                alert.setContentText("Are you sure?");
+        btExit.setOnAction((ActionEvent event) -> 
+        { 
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.getDialogPane().setStyle("-fx-border-color: black;");
+            alert.initModality(Modality.APPLICATION_MODAL);
 
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.get() == ButtonType.OK){
-                    System.exit(1);
-                }else 
-                {
-                    alert.close();
-                }
-                
+            alert.initStyle(StageStyle.UNDECORATED);
+
+            alert.initOwner(primaryStage);
+            alert.setHeaderText("Quit Game");
+            alert.setContentText("Are you sure?");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            /* 
+             *  To retrieve the value without an error, even if the Optional is 
+             *  empty (not 100% sure this can happen in this case, but it does 
+             *  not hurt to do it like this).
+             */
+            if (result.orElse(null) == ButtonType.OK) {
+                /* 
+                 * Platform.exit shuts down the application more gracefully. 
+                 * After all a status code of 1 indicates abnormal termination.
+                 */
+                Platform.exit();
             }
         });
         
