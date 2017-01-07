@@ -28,6 +28,7 @@
  * Milestone   | adakac      | 20.10.2016  | Added Settings GUI w/o Audio Func.*
  * Milestone   | heralc15    | 05.01.2017  | Adjusted button size              *
  * Milestone   | adakac      | 07.01.2017  | Fixed the exit alert              *
+ * Milestone   | adakac      | 07.01.2017  | Added German lang, settings work  *
  *             |             |             |                                   *
  *             |             |             |                                   *
  *             |             |             |                                   *
@@ -44,7 +45,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -53,11 +53,9 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.Slider;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -79,7 +77,7 @@ public class Project_A extends Application
     // Variables
     double  displayWidth,           //width in px
             displayHeight;          //hight in px
-    int     audioVolume,            //Volume in percent
+    int     audioVolume=50,         //Volume in percent
             language=1;             //1=english 2=german
     String  lastLocation;           //
     
@@ -126,14 +124,9 @@ public class Project_A extends Application
         primaryStage.setScene(sceneIntro);
         primaryStage.show();
         
-        mp.setOnEndOfMedia(new Runnable() 
-        {
-            @Override
-            public void run() 
-            {
-                primaryStage.close();
-                startMenu(primaryStage);
-            }
+        mp.setOnEndOfMedia(() -> {
+            primaryStage.close();
+            startMenu(primaryStage);
         });
     }
     
@@ -153,136 +146,180 @@ public class Project_A extends Application
         buttonGrid.setVgap(10);
         buttonGrid.setPadding(new Insets(25, 25, 25, 25));
         
-        Button btPlay = new Button("Play");
-        btPlay.setMinWidth(100);
-        buttonGrid.add(btPlay, 0, 1);
-
-        Button btLoad = new Button("Load");
-        btLoad.setMinWidth(100);
-        buttonGrid.add(btLoad, 0, 2);
-
-        Button btSettings = new Button("Settings");
-        btSettings.setMinWidth(100);
-        buttonGrid.add(btSettings, 0, 3);
-        btSettings.setOnAction(new EventHandler<ActionEvent>() 
+        Button btPlay = new Button();
+        Button btLoad = new Button();
+        Button btSettings = new Button();
+        Button btCredits = new Button();
+        Button btExit = new Button();
+                
+        switch(language)
         {
-            @Override
-            public void handle(ActionEvent event) 
+            case 1:
             {
-                lastLocation = "onSettingsKlicked";
-                
-                primaryStage.close();
-                primaryStage.setFullScreen(true);
+                btPlay.setText("Play");
+                btPlay.setMinWidth(100);
+                buttonGrid.add(btPlay, 0, 1);
 
-                // Remove 'Exit Fullscreen' function
-                primaryStage.setFullScreenExitHint("");
-                primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+                btLoad.setText("Load");
+                btLoad.setMinWidth(100);
+                buttonGrid.add(btLoad, 0, 2);
 
-                // Prepare scene
-                rootMenu = new StackPane();
-                Scene sceneMenu = new Scene(rootMenu, displayWidth, displayHeight);  
+                btSettings.setText("Settings");
+                btSettings.setMinWidth(100);
+                buttonGrid.add(btSettings, 0, 3);
+                
+                btCredits.setText("Credits");
+                btCredits.setMinWidth(100);
+                buttonGrid.add(btCredits, 0, 4);
 
-                rootMenu.setStyle("-fx-background: #000000;");
+                btExit.setText("Exit Game");
+                btExit.setMinWidth(100);
+                buttonGrid.add(btExit, 0, 5);
                 
-                primaryStage.setScene(sceneMenu);
-                primaryStage.show();
-                
-                GridPane settingsGrid = new GridPane();
-                settingsGrid.setAlignment(Pos.CENTER);
-                settingsGrid.setHgap(10);
-                settingsGrid.setVgap(10);
-                settingsGrid.setPadding(new Insets(25, 25, 25, 25));
-                
-                Label lbVolumeValue = new Label();
-                lbVolumeValue.setMinWidth(50);
-                
-                Label lbVolumeText = new Label();
-                lbVolumeText.setAlignment(Pos.CENTER_RIGHT);
-                lbVolumeText.setMinWidth(100);
-                
-                Button btLeaveSettings = new Button("Back to the menu");
-                btLeaveSettings.setMinWidth(150);
-                btLeaveSettings.setOnAction(new EventHandler<ActionEvent>() 
-                {
-                    @Override
-                    public void handle(ActionEvent event) 
-                    {
-                        primaryStage.close();
-                        startMenu(primaryStage);
-                    }
-                });
-                
-                Slider volumeSlider = new Slider();
-                volumeSlider.setMin(0);
-                volumeSlider.setMax(100);
-                volumeSlider.setValue(50);
-                lbVolumeValue.setText(((int)volumeSlider.getValue())+"");
-                volumeSlider.setShowTickLabels(true);
-                volumeSlider.setShowTickMarks(true);
-                volumeSlider.setMajorTickUnit(50);
-                volumeSlider.setMinorTickCount(5);
-                volumeSlider.setBlockIncrement(10);
-                volumeSlider.valueProperty().addListener(new ChangeListener<Number>()
-                {
-                    @Override
-                    public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) 
-                    {
-                        audioVolume = (int) volumeSlider.getValue();
-                        lbVolumeValue.setText(audioVolume+"");
-                    }
-                });
-                
-                ChoiceBox languageBox = new ChoiceBox(FXCollections.observableArrayList("English", "German"));
-                languageBox.setMinWidth(150);
-                if(language == 1)
-                {
-                    lbVolumeText.setText("Volume");
-                    languageBox.setValue("English");
-                }
-                    
-                if(language == 2)
-                {
-                    languageBox.setValue("German");
-                    lbVolumeText.setText("Lautstärke");
-                }
-                
-                languageBox.valueProperty().addListener(new ChangeListener<String>()
-                {
-                    @Override
-                    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue)
-                    {
-                        switch((String)languageBox.getValue())
-                        {
-                            case "English": language=1;
-                                            lbVolumeText.setText("Volume");
-                                            break;
-                                            
-                            case "German":  language=2;
-                                            lbVolumeText.setText("Lautstärke");
-                                            break;
-                        }
-                        rootMenu.requestLayout();
-                    }
-
-                });
-                
-                settingsGrid.add(lbVolumeText, 0, 0);
-                settingsGrid.add(volumeSlider, 1, 0);
-                settingsGrid.add(lbVolumeValue, 2, 0);
-                settingsGrid.add(languageBox, 1, 1);
-                settingsGrid.add(btLeaveSettings,1,2);
-                rootMenu.getChildren().add(settingsGrid);
-                rootMenu.setVisible(true);
+                break;
             }
+            case 2:
+            {
+                btPlay = new Button("Spielen");
+                btPlay.setMinWidth(100);
+                buttonGrid.add(btPlay, 0, 1);
+
+                btLoad = new Button("Laden");
+                btLoad.setMinWidth(100);
+                buttonGrid.add(btLoad, 0, 2);
+
+                btSettings = new Button("Einstellungen");
+                btSettings.setMinWidth(100);
+                buttonGrid.add(btSettings, 0, 3);
+                
+                btCredits.setText("Mitwirkende");
+                btCredits.setMinWidth(100);
+                buttonGrid.add(btCredits, 0, 4);
+
+                btExit.setText("Spiel beenden");
+                btExit.setMinWidth(100);
+                buttonGrid.add(btExit, 0, 5);
+                
+                break;
+            }
+            default:
+            {
+                //TODO Exception handling
+                System.exit(1);
+            }
+        }
+        
+        btSettings.setOnAction((ActionEvent event) -> {
+            lastLocation = "onSettingsKlicked";
+            
+            primaryStage.close(); 
+            primaryStage.setFullScreen(true);
+            
+            // Remove 'Exit Fullscreen' function
+            primaryStage.setFullScreenExitHint("");
+            primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+            
+            // Prepare scene
+            rootMenu = new StackPane();
+            Scene sceneMenu = new Scene(rootMenu, displayWidth, displayHeight);
+            
+            rootMenu.setStyle("-fx-background: #000000;");
+            
+            primaryStage.setScene(sceneMenu);
+            primaryStage.show();
+            
+            GridPane settingsGrid = new GridPane();
+            settingsGrid.setAlignment(Pos.CENTER);
+            settingsGrid.setHgap(10);
+            settingsGrid.setVgap(10);
+            settingsGrid.setPadding(new Insets(25, 25, 25, 25));
+            
+            Label lbVolumeValue = new Label();
+            lbVolumeValue.setMinWidth(50);
+            
+            Label lbLanguageText = new Label();
+            lbLanguageText.setAlignment(Pos.CENTER_RIGHT);
+            lbLanguageText.setMinWidth(100);
+            
+            Label lbVolumeText = new Label();
+            lbVolumeText.setAlignment(Pos.CENTER_RIGHT);
+            lbVolumeText.setMinWidth(100);
+            
+            Button btLeaveSettings = new Button();
+            btLeaveSettings.setMinWidth(150);
+            btLeaveSettings.setOnAction((ActionEvent evt) -> {
+                primaryStage.close();
+                startMenu(primaryStage);
+            });
+            
+            Slider volumeSlider = new Slider();
+            volumeSlider.setMin(0);
+            volumeSlider.setMax(100);
+            volumeSlider.setValue(audioVolume);
+            lbVolumeValue.setText(((int)volumeSlider.getValue())+"");
+            volumeSlider.setShowTickLabels(true);
+            volumeSlider.setShowTickMarks(true);
+            volumeSlider.setMajorTickUnit(50);
+            volumeSlider.setMinorTickCount(5);
+            volumeSlider.setBlockIncrement(10);
+            volumeSlider.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+                audioVolume = (int) volumeSlider.getValue();
+                lbVolumeValue.setText(audioVolume+"");
+            });
+            
+            ChoiceBox languageBox = new ChoiceBox(FXCollections.observableArrayList("English", "German"));
+            languageBox.setMinWidth(150);
+            if(language == 1)
+            {
+                lbVolumeText.setText("Volume");
+                languageBox.setValue("English");
+                lbLanguageText.setText("Language");
+                btLeaveSettings.setText("Back to the menu");
+            }
+            
+            if(language == 2)
+            {
+                languageBox.setValue("German");
+                lbVolumeText.setText("Lautstärke");
+                lbLanguageText.setText("Sprache");
+                btLeaveSettings.setText("Zurück zum Menü");
+            }
+            
+            languageBox.valueProperty().addListener(new ChangeListener<String>()
+            {
+                @Override
+                public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue)
+                {
+                    switch((String)languageBox.getValue())
+                    {
+                        case "English": language=1;
+                        lbVolumeText.setText("Volume");
+                        lbLanguageText.setText("Language");
+                        btLeaveSettings.setText("Back to the menu");
+                        break;
+                        
+                        case "German":  language=2;
+                        lbVolumeText.setText("Lautstärke");
+                        lbLanguageText.setText("Sprache");
+                        btLeaveSettings.setText("Zurück zum Menü");
+                        break;
+                    }
+                    rootMenu.requestLayout();
+                }
+                
+            });
+            
+            settingsGrid.add(lbVolumeText, 0, 0);
+            settingsGrid.add(volumeSlider, 1, 0);
+            settingsGrid.add(lbVolumeValue, 2, 0);
+            settingsGrid.add(lbLanguageText, 0, 1);
+            settingsGrid.add(languageBox, 1, 1);
+            settingsGrid.add(btLeaveSettings,1,2);
+            rootMenu.getChildren().add(settingsGrid);
+            rootMenu.setVisible(true);
         });
                 
-        Button btCredits = new Button("Credits");
-        btCredits.setMinWidth(100);
-        buttonGrid.add(btCredits, 0, 4);
         
-        Button btExit = new Button("Exit Game");
-        btExit.setMinWidth(100);
-        buttonGrid.add(btExit, 0, 5);
         btExit.setOnAction((ActionEvent event) -> 
         { 
             Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -292,8 +329,26 @@ public class Project_A extends Application
             alert.initStyle(StageStyle.UNDECORATED);
 
             alert.initOwner(primaryStage);
-            alert.setHeaderText("Quit Game");
-            alert.setContentText("Are you sure?");
+            switch(language)
+            {
+                case 1:
+                {
+                    alert.setHeaderText("Quit Game");
+                    alert.setContentText("Are you sure?");
+                    break;
+                }
+                case 2:
+                {
+                    alert.setHeaderText("Spiel beenden");
+                    alert.setContentText("Bist du dir sicher?");
+                    break;
+                }
+                default:
+                {
+                    //TODO Exception handling
+                    System.exit(1);
+                }
+            }
 
             Optional<ButtonType> result = alert.showAndWait();
             /* 
